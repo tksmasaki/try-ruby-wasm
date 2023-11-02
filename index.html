@@ -1,0 +1,50 @@
+<html>
+<head>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="https://getty104.github.io/ruby-wasm-vdom/index.js"></script>
+  <script type="text/ruby">
+    state = {
+      count: 0,
+      name: '',
+      is_valid: false,
+    }
+
+    actions = {
+      increment: ->(state, value) {
+        state[:count] += 1
+      },
+      update_name: ->(state, value) {
+        state[:name] = value
+        state[:is_valid] = value.length > 0
+      },
+    }
+
+    view = ->(state, actions) {
+      eval DomParser.parse(<<-DOM)
+        <div>
+          <div>
+            <button onclick='{->(e) { actions[:increment].call(state, nil) } }'>Click me!</button>
+            <p>{"Count is #{state[:count]}"}</p>
+          </div>
+          <div>
+            <form>
+              <label>名前</label>
+              <input type='text' oninput='{->(e) { actions[:update_name].call(state, e[:target][:value].to_s) } }' />
+              <p style='{ state[:is_valid] ? "" : "color: red;" }'>{state[:is_valid] ? "" : "名前を入力してください"}</p>
+            </form>
+          </div>
+        </div>
+      DOM
+    }
+
+    App.new(
+      el: "#app",
+      state:,
+      view:,
+      actions:
+    )
+  </script>
+</body>
+</html>
